@@ -33,7 +33,7 @@ class Display3D(object):
     self.dcam.SetBounds(0.0, 1.0, 0.0, 1.0, -w/h)
     self.dcam.SetHandler(self.handler)
 
-    # Display for image
+    # Display for 2d image
     wi, hi = 512, 512#640, 480
     self.dimg = pangolin.Display("Image")
     self.dimg.SetBounds(0, hi/h, 1-wi/w, 1.0, -w/h)

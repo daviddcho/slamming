@@ -1,1 +1,2 @@
-working towards SLAM
+working towards visual-inertial SLAM
+using camera and IMU 

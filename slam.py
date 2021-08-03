@@ -30,6 +30,7 @@ if __name__ == "__main__":
     else:
       break
 
+    """
     gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
     pts = cv2.goodFeaturesToTrack(gray, 100, 0.01, 10)
     pts = np.int0(pts)
@@ -37,9 +38,12 @@ if __name__ == "__main__":
       #print(f[0][0], f[0][1])
       x,y = f.ravel()
       cv2.circle(frame, (x,y), 3, 255, -1)
-
+    """
     time.sleep(.01)    
-    disp3d.paint(frame)
+
+    frame = Frame(frame)
+    img = frame.annotate()
+    disp3d.paint(img)
     i += 1   
 
 
