@@ -5,12 +5,14 @@ import pypangolin as pangolin
 import cv2
 
 class Display3D(object): 
-  def __init__(self):
+  def __init__(self, wi, hi):
+    self.wi, self.hi = wi, hi
     self.state = None
     self.q = Queue()
     self.vp = Process(target=self.viewer_thread, args=(self.q,))
     self.vp.daemon = True
     self.vp.start() 
+
 
   def viewer_thread(self, q):
     w, h = 1024, 768 
@@ -33,14 +35,25 @@ class Display3D(object):
     self.dcam.SetBounds(0.0, 1.0, 0.0, 1.0, -w/h)
     self.dcam.SetHandler(self.handler)
 
-    # Display for 2d image
-    wi, hi = 512, 512#640, 480
-    self.dimg = pangolin.Display("Image")
-    self.dimg.SetBounds(0, hi/h, 1-wi/w, 1.0, -w/h)
+    # Display for image
+    self.dimg = pangolin.Display("image")
+    #self.dimg.SetBounds(1./3, 1.0, 0.0, 1./3, w/h)
+    #print(0, self.hi/h, 1-self.wi/w, 1.0, -w/h)
+    print(w, h, -w/h)
+    #self.dimg.SetBounds(0.0, 1.0, 0.0, 1.0, -w/h)
+    self.dimg.SetBounds(0, self.hi/h, 1-self.wi/w, 1.0, -w/h)
     self.dimg.SetLock(pangolin.Lock.LockLeft, pangolin.Lock.LockTop)
 
-    self.texture = pangolin.GlTexture(wi, hi, gl.GL_RGB, False, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE)
-    self.img = np.ones((hi, wi, 3), dtype="uint8")*255
+    """
+    view = pangolin.Display("multi")
+    view.SetBounds(0.0, 1.0, 0.0, 1.0)
+    view.SetLayout(pangolin.LayoutOverlay)
+    view.AddDisplay(dcam) 
+    view.AddDisplay(dimg)
+    """
+    
+    self.texture = pangolin.GlTexture(self.wi, self.hi, gl.GL_RGB, False, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE)
+    self.img = np.ones((self.hi, self.wi, 3), dtype="uint8")*255
 
   def viewer_refresh(self, q): 
     while not self.q.empty():
@@ -48,14 +61,14 @@ class Display3D(object):
 
     if self.state is not None:
       self.img = self.state
+      self.img = cv2.resize(self.img, (self.wi, self.hi))
 
     gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
     gl.glClearColor(0.0, 0.0, 0.0, 1.0)
     self.dcam.Activate(self.scam)
 
-    # Upload image
     self.texture.Upload(self.img, gl.GL_RGB, gl.GL_UNSIGNED_BYTE)
-    # Display the image
+
     self.dimg.Activate()
     gl.glColor3f(1.0, 1.0, 1.0)
     self.texture.RenderToViewportFlipY()
