@@ -3,20 +3,49 @@ import sys
 import cv2
 import numpy as np
 from display import Display3D
-from frame import Frame
+from frame import Frame, denormalize, match_frames
 import time
 
+frames = []
+def process_frame(img, K):
+  frame = Frame(img, K)
+  frames.append(frame)
+  if len(frames) <= 1:
+    return 
+
+  ret = match_frames(frames[-1], frames[-2])
+  for pt1, pt2 in ret:
+    u1, v1 = denormalize(K, pt1)
+    u2, v2 = denormalize(K, pt2)
+    cv2.circle(img, (u1, v1), 3, color=(0,255,0))
+    cv2.line(img, (u1, v1), (u2, v2), color=(255,0,0))
+  
+  return np.array(img)
+
+def display(img):
+  if img is not None:
+    cv2.imshow("img", img)
+    cv2.waitKey(1)
+
+  
 if __name__ == "__main__":
   if len(sys.argv) < 2:
     print("./slam <video.mp4>")
     exit()
 
-  disp3d = Display3D()
   cap = cv2.VideoCapture(sys.argv[1])
 
   CNT = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
   W = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
   H = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
+  
+  #disp3d = Display3D(W, H)
+  
+  # camera instrinics
+  F = 270
+  K = np.array([[F, 0, W//2],
+               [0, F, H//2],
+               [0, 0,    1]])
 
   i = 0
   while cap.isOpened():
@@ -24,26 +53,12 @@ if __name__ == "__main__":
     print("*** frames %d/%d ***" % (i, CNT))
     if ret == True:
       frame = cv2.resize(frame, (W, H))
-      # something like process frame?
-      # get key points or smt 
-      # then paint
+      img = process_frame(frame, K)
     else:
       break
-
-    """
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    pts = cv2.goodFeaturesToTrack(gray, 100, 0.01, 10)
-    pts = np.int0(pts)
-    for f in pts:
-      #print(f[0][0], f[0][1])
-      x,y = f.ravel()
-      cv2.circle(frame, (x,y), 3, 255, -1)
-    """
-    time.sleep(.01)    
-
-    frame = Frame(frame)
-    img = frame.annotate()
-    disp3d.paint(img)
+    #time.sleep(.01)    
+    
+    display(img)
+    #disp3d.paint(img)
     i += 1   
-
 
