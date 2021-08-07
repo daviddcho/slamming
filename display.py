@@ -13,7 +13,6 @@ class Display3D(object):
     self.vp.daemon = True
     self.vp.start() 
 
-
   def viewer_thread(self, q):
     w, h = 1024, 768 
     self.viewer_init(w, h)
@@ -38,20 +37,15 @@ class Display3D(object):
     # Display for image
     self.dimg = pangolin.Display("image")
     #self.dimg.SetBounds(1./3, 1.0, 0.0, 1./3, w/h)
-    #print(0, self.hi/h, 1-self.wi/w, 1.0, -w/h)
+    print(self.hi, self.wi)
+    print(0, self.hi/h, 1-self.wi/w, 1.0, -w/h)
     print(w, h, -w/h)
     #self.dimg.SetBounds(0.0, 1.0, 0.0, 1.0, -w/h)
-    self.dimg.SetBounds(0, self.hi/h, 1-self.wi/w, 1.0, -w/h)
+    #self.dimg.SetBounds(0, 0.26041, 0.4140625, 1.0, -w/h)
+    self.dimg.SetBounds(1./3, 1.0, 0.0, 2./3, w/h)
+    #self.dimg.SetBounds(0.0, self.hi/h, self.wi/w, 1.0, w/h)
     self.dimg.SetLock(pangolin.Lock.LockLeft, pangolin.Lock.LockTop)
 
-    """
-    view = pangolin.Display("multi")
-    view.SetBounds(0.0, 1.0, 0.0, 1.0)
-    view.SetLayout(pangolin.LayoutOverlay)
-    view.AddDisplay(dcam) 
-    view.AddDisplay(dimg)
-    """
-    
     self.texture = pangolin.GlTexture(self.wi, self.hi, gl.GL_RGB, False, 0, gl.GL_RGB, gl.GL_UNSIGNED_BYTE)
     self.img = np.ones((self.hi, self.wi, 3), dtype="uint8")*255
 
@@ -61,6 +55,7 @@ class Display3D(object):
 
     if self.state is not None:
       self.img = self.state
+      self.img = self.img[::-1, :]
       self.img = cv2.resize(self.img, (self.wi, self.hi))
 
     gl.glClear(gl.GL_COLOR_BUFFER_BIT | gl.GL_DEPTH_BUFFER_BIT)
@@ -68,10 +63,11 @@ class Display3D(object):
     self.dcam.Activate(self.scam)
 
     self.texture.Upload(self.img, gl.GL_RGB, gl.GL_UNSIGNED_BYTE)
-
+    cv2.imshow("img", self.img[::-1, :])
+    
     self.dimg.Activate()
     gl.glColor3f(1.0, 1.0, 1.0)
-    self.texture.RenderToViewportFlipY()
+    self.texture.RenderToViewport()#FlipY()
 
     pangolin.FinishFrame()
 
@@ -80,3 +76,4 @@ class Display3D(object):
       return
 
     self.q.put(np.array(img))
+
