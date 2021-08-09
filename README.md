@@ -1,9 +1,15 @@
 working towards visual-inertial SLAM
 using camera and IMU 
 
-EKF for imu and vision: https://sci-hub.se/10.1109/ROBOT.2007.364024
+EKF stuff:
+* EKF for imu and vision: https://sci-hub.se/10.1109/ROBOT.2007.364024
+  * implementation: https://github.com/uoip/stereo_msckf
+* https://github.com/AtsushiSakai/PythonRobotics/tree/master/Localization/extended_kalman_filter
 
 resources:
-* MonoVI SLAM: https://arxiv.org/pdf/1706.03648.pdf
-* MonoSLAM: https://www.doc.ic.ac.uk/~ajd/Publications/davison_etal_pami2007.pdf
 * ORB-SLAM: https://arxiv.org/pdf/1502.00956.pdf
+* https://github.com/luigifreda/pyslam
+* LSD-SLAM, MonoSLAM
+* a survey: https://fzheng.me/2016/03/13/slam-papers/#visual-inertial-slam
+
+
