@@ -4,8 +4,8 @@ import cv2
 def extract_features(img):
   orb = cv2.ORB_create()
   # detection
-  #img = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2GRAY)
-  pts = cv2.goodFeaturesToTrack(np.mean(img, axis=2).astype(np.uint8), 3000, qualityLevel=0.01, minDistance=7)
+  gimg = cv2.cvtColor(np.float32(img), cv2.COLOR_BGR2GRAY)
+  pts = cv2.goodFeaturesToTrack(gimg, 3000, qualityLevel=0.01, minDistance=7)
   #pts = np.int0(pts)
 
   # extraction
@@ -13,7 +13,7 @@ def extract_features(img):
   kps, des = orb.compute(img, kps)
 
   # return pts and descriptors
-  kps = np.array([(kp.pt[0], kp.pt[1]) for kp in kps]).astype(np.uint8)
+  kps = np.array([(int(kp.pt[0]), int(kp.pt[1])) for kp in kps])
   return kps, des
 
 def match_frames(f1, f2):
@@ -37,7 +37,9 @@ def add_ones(x):
   return np.concatenate([x, np.ones((x.shape[0], 1))], axis=1)
 
 def normalize(Kinv, pts):
-  return np.dot(Kinv, add_ones(pts).T).T[:, 0:2]
+  ret = add_ones(pts).T
+  ret = np.dot(Kinv, ret).T[:, 0:2]
+  return ret
 
 def denormalize(K, pt):
   ret = np.dot(K, np.array([pt[0], pt[1], 1.0]))
@@ -58,5 +60,4 @@ class Frame(object):
       x, y = denormalize(self.K, pt)
       cv2.circle(self.img, (x,y), 3, (0,255,0), -1)
     return self.img
-
 
