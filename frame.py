@@ -45,9 +45,16 @@ def match_frames(f1, f2):
   print(sum(inliers), len(inliers))
   ret = ret[inliers]
   #print(model.params)
-
-  s,v,d = np.linalg.svd(model.params)
-  print(v)
+  
+  W = np.mat([[0,-1,0],[1,0,0],[0,0,1]], dtype=float)
+  u,w,vt = np.linalg.svd(model.params)
+  assert np.linalg.det(u) > 0
+  if np.linalg.det(vt) < 0:
+    vt *= -1.0
+  R = np.dot(np.dot(u, W), vt)
+  if np.sum(R.diagonal()) < 0: 
+    R = np.dot(np.dot(u,W.T), vt)
+  print(R)
 
   return ret
   
