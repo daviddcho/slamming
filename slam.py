@@ -43,7 +43,7 @@ if __name__ == "__main__":
 
   #disp3d = Display3D(W, H)
   # camera instrinics
-  F = 270 
+  F = 270
   K = np.array([[F, 0, W//2],
                [0, F, H//2],
                [0, 0,    1]])
