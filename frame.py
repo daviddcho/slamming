@@ -5,6 +5,20 @@ import cv2
 from skimage.measure import ransac
 from skimage.transform import FundamentalMatrixTransform, EssentialMatrixTransform
 
+def extractRt(E):
+  # https://stackoverflow.com/questions/20614062/pose-from-fundamental-matrix-and-vice-versa
+  W = np.mat([[0,-1,0],[1,0,0],[0,0,1]], dtype=float)
+  U,d,Vt = np.linalg.svd(E)
+  assert np.linalg.det(U) > 0
+  if np.linalg.det(Vt) < 0:
+    Vt *= -1.0
+  R = np.dot(np.dot(U, W), Vt)
+  if np.sum(R.diagonal()) < 0: 
+    R = np.dot(np.dot(U,W.T), Vt)
+  t = U[:, 2]
+  Rt = np.concatenate((R, t.reshape(3,1)), axis=1)
+  return Rt
+ 
 def extract_features(img):
   orb = cv2.ORB_create()
   # detection
@@ -42,19 +56,11 @@ def match_frames(f1, f2):
                           residual_threshold=.005,
                           max_trials=100)
 
-  print(sum(inliers), len(inliers))
+  #print(sum(inliers), len(inliers))
   ret = ret[inliers]
-  #print(model.params)
-  
-  W = np.mat([[0,-1,0],[1,0,0],[0,0,1]], dtype=float)
-  u,w,vt = np.linalg.svd(model.params)
-  assert np.linalg.det(u) > 0
-  if np.linalg.det(vt) < 0:
-    vt *= -1.0
-  R = np.dot(np.dot(u, W), vt)
-  if np.sum(R.diagonal()) < 0: 
-    R = np.dot(np.dot(u,W.T), vt)
-  print(R)
+
+  Rt = extractRt(model.params) 
+  print(Rt)
 
   return ret
   

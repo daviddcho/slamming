@@ -13,8 +13,9 @@ def process_frame(img, K):
   if len(frames) <= 1:
     return 
 
-  ret = match_frames(frames[-1], frames[-2])
-  for pt1, pt2 in ret:
+  matches = match_frames(frames[-1], frames[-2])
+  print("%d matches" % len(matches))
+  for pt1, pt2 in matches:
     u1, v1 = denormalize(K, pt1)
     u2, v2 = denormalize(K, pt2)
     cv2.circle(img, (u1, v1), color=(0,255,0), radius=3)
