@@ -6,6 +6,7 @@ from display import Display3D
 from frame import Frame, denormalize, match_frames, extract_features
 import time
 
+poses = []
 frames = []
 def process_frame(img, K):
   frame = Frame(img, K)
@@ -13,7 +14,11 @@ def process_frame(img, K):
   if len(frames) <= 1:
     return 
 
-  matches = match_frames(frames[-1], frames[-2])
+  matches, Rt = match_frames(frames[-1], frames[-2])
+  frames[-1].pose = np.dot(Rt, frames[-2].pose)
+  print(frames[-1].pose)
+  poses.append(frames[-1].pose)
+
   print("%d matches" % len(matches))
   for pt1, pt2 in matches:
     u1, v1 = denormalize(K, pt1)
@@ -42,9 +47,9 @@ if __name__ == "__main__":
     W = W//2
     H = H//2
 
-  #disp3d = Display3D(W, H)
+  disp3d = Display3D(W, H)
   # camera instrinics
-  F = 270
+  F = 270 
   K = np.array([[F, 0, W//2],
                [0, F, H//2],
                [0, 0,    1]])
@@ -61,7 +66,7 @@ if __name__ == "__main__":
     #time.sleep(1)    
     
     display(img)
-    #disp3d.paint(img)
+    disp3d.paint(poses)
     i += 1   
 
 

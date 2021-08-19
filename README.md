@@ -12,4 +12,5 @@ resources:
 * LSD-SLAM, MonoSLAM
 * a survey: https://fzheng.me/2016/03/13/slam-papers/#visual-inertial-slam
 
+computer vision basics: https://cseweb.ucsd.edu/classes/sp04/cse252b/notes/lec01/lec1.pdf
 
