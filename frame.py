@@ -61,7 +61,7 @@ def match_frames(f1, f2):
                           min_samples=8,
                           #residual_threshold=1,
                           residual_threshold=.005,
-                          max_trials=200)
+                          max_trials=100)
 
   ret = ret[inliers]
   Rt = extractRt(model.params) 

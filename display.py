@@ -26,8 +26,10 @@ class Display3D(object):
     # Define Projection and initial ModelView matrix
     self.scam = pangolin.OpenGlRenderState(
       pangolin.ProjectionMatrix(w, h, 420, 420, w//2, h//2, 0.2, 10000),
-      pangolin.ModelViewLookAt(-2, 2, -2, 0, 0, 0, pangolin.AxisDirection.AxisY))
-      #pangolin.ModelViewLookAt(0, -10, -8, 0, 0, 0, 0, -1, 0))
+      #pangolin.ModelViewLookAt(-2, 2, -2, 0, 0, 0, pangolin.AxisDirection.AxisY))
+      pangolin.ModelViewLookAt(0, -10, -8, 
+                               0,   0,  0, 
+                               0,  -1,  0))
 
     self.handler = pangolin.Handler3D(self.scam)
     
@@ -47,19 +49,25 @@ class Display3D(object):
     if self.state is not None:
       gl.glLineWidth(1)
       # Render previous pose 
-      if self.state.shape[0] >= 2:
+      if self.state[0].shape[0] >= 2:
         gl.glColor3f(0.0, 1.0, 0.0) 
-        pangolin.DrawCameras(self.state[:-1])
+        pangolin.DrawCameras(self.state[0][:-1])
       # Render current pose
-      if self.state.shape[0] >= 1:
+      if self.state[0].shape[0] >= 1:
         gl.glColor3f(1.0, 0.0, 1.0)
-        pangolin.DrawCameras(self.state[-1:])
+        pangolin.DrawCameras(self.state[0][-1:])
+      
+      # Render points
+      if self.state[1].shape[0] != 0:
+        gl.glPointSize(1)
+        gl.glColor3f(1.0, 0.0, 0.0)
+        pangolin.DrawPoints(self.state[1])
 
     pangolin.FinishFrame()
 
-  def paint(self, poses):
+  def paint(self, poses, pts):
     if self.q is None:
       return
-  
-    self.q.put(np.array(poses))
+    
+    self.q.put((np.array(poses), np.array(pts)))
 

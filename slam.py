@@ -6,6 +6,7 @@ from display import Display3D
 from frame import Frame, denormalize, match_frames, extract_features
 import time
 
+pts = []
 poses = []
 frames = []
 def process_frame(img, K):
@@ -18,6 +19,12 @@ def process_frame(img, K):
   frames[-1].pose = np.dot(Rt, frames[-2].pose)
   print(frames[-1].pose)
   poses.append(frames[-1].pose)
+
+  pts4d = cv2.triangulatePoints(frames[-1].pose[:3], frames[-2].pose[:3], matches[:,0].T, matches[:,1].T).T
+  pts4d /= pts4d[:,3:]
+  for p in pts4d:
+    print(p)
+    pts.append(p)
 
   print("%d matches" % len(matches))
   for pt1, pt2 in matches:
@@ -49,7 +56,7 @@ if __name__ == "__main__":
 
   disp3d = Display3D(W, H)
   # camera instrinics
-  F = 270 
+  F = 270 #190.97
   K = np.array([[F, 0, W//2],
                [0, F, H//2],
                [0, 0,    1]])
@@ -66,7 +73,7 @@ if __name__ == "__main__":
     #time.sleep(1)    
     
     display(img)
-    disp3d.paint(poses)
+    disp3d.paint(poses, pts)
     i += 1   
 
 
