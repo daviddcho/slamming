@@ -9,7 +9,7 @@ Pipeline:
 2. Compute descriptors (orb)
 3. Match features (lowes ratio test)
 4. Filter matched features (ransac)
-  * you can find focal from fundamental matrix for camera calibration
+4.5. you can find focal from fundamental matrix for camera calibration
 5. Extract (pose) Rt from essential matrix
 6. Triangulate the points into homogenuous 3d coords (direct linear triangulation)
 
