@@ -60,7 +60,7 @@ class Display3D(object):
       # Render points
       if self.state[1].shape[0] != 0:
         gl.glPointSize(1)
-        gl.glColor3f(1.0, 0.0, 0.0)
+        gl.glColor3f(0.0, 0.0, 1.0)
         pangolin.DrawPoints(self.state[1])
 
     pangolin.FinishFrame()

@@ -23,7 +23,7 @@ def process_frame(img, K):
   pts4d = cv2.triangulatePoints(frames[-1].pose[:3], frames[-2].pose[:3], matches[:,0].T, matches[:,1].T).T
   pts4d /= pts4d[:,3:]
   for p in pts4d:
-    print(p)
+    p *= -1.0
     pts.append(p)
 
   print("%d matches" % len(matches))
